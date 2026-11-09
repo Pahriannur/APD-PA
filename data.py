@@ -220,8 +220,8 @@ def register_user(username, password):
     kursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
     if kursor.fetchone() is not None:
         raise ValueError("Username sudah dipakai!")
-    if len(password) < 3:
-        raise ValueError("Password minimal 3 karakter!")
+    if len(password) < 10:
+        raise ValueError("Password minimal 10 karakter!")
     kursor.execute(
         "INSERT INTO users (username, password, role, saldo) "
         "VALUES (?, ?, 'Pengguna Biasa', 0)",

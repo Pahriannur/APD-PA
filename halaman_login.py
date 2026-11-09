@@ -9,7 +9,7 @@ def login():
         data.bersihkan_layar()
         data.tampil_judul("LOGIN")
         username = data.tanya("Username : ")
-        password = data.tanya_rahasia("Password : ")
+        password = data.tanya("Password : ")
 
         user = data.cek_login(username, password)
         if user is not None:
@@ -28,7 +28,7 @@ def register():
     data.bersihkan_layar()
     data.tampil_judul("REGISTER")
     user_baru = data.tanya("Username baru : ")
-    pass_baru = data.tanya_rahasia("Password baru (min. 3 karakter) : ")
+    pass_baru = data.tanya("Password baru (min. 10 karakter) : ")
     try:
         data.register_user(user_baru, pass_baru)
     except ValueError as pesan_error:
