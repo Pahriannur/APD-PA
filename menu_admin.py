@@ -7,18 +7,18 @@ def menu_admin(nama_aktif):
 
     while sudah_login:
         data.bersihkan_layar()
-        print("=" * 42)
-        print("Halo,", nama_aktif, "(" + role_aktif + ")")
-        print("=" * 42)
-        print("[1] Jual HP              (Create)")
-        print("[2] Lihat / Cari HP      (Read)")
-        print("[3] Ubah Data HP         (Update)")
-        print("[4] Hapus HP             (Delete)")
-        print("[5] Kelola Pengguna")
-        print("[6] Riwayat Semua Transaksi")
-        print("[7] Beli HP dari Pengguna")
-        print("[0] Logout")
-        menu = input("Pilih menu: ").strip()
+        data.tampil_header(nama_aktif, role_aktif)
+        data.tampil_menu([
+            ("1", "Jual HP              (Create)"),
+            ("2", "Lihat / Cari HP      (Read)"),
+            ("3", "Ubah Data HP         (Update)"),
+            ("4", "Hapus HP             (Delete)"),
+            ("5", "Kelola Pengguna"),
+            ("6", "Riwayat Semua Transaksi"),
+            ("7", "Beli HP dari Pengguna"),
+            ("0", "Logout"),
+        ])
+        menu = data.tanya("Pilih menu : ")
 
         if menu == "1":
             data.tampil_jual_hp(nama_aktif)
@@ -45,29 +45,22 @@ def menu_admin(nama_aktif):
             sudah_login = False
 
         else:
-            print("Error: Menu tidak tersedia!")
-            input("Tekan Enter untuk kembali...")
+            data.cetak_error("Menu tidak tersedia!")
+            data.tunggu()
 
 
 def kelola_pengguna():
     data.bersihkan_layar()
-    print("=== KELOLA PENGGUNA ===")
-    print("No | Username | Role | Saldo")
-    print("-" * 45)
-    nomor = 1
-    for u in data.ambil_semua_user():
-        print(nomor, "|", u["username"], "|", u["role"], "| Rp",
-              data.format_rupiah(u["saldo"]))
-        nomor += 1
-    print("-" * 45)
-    hapus = input("Username yang ingin dihapus (kosong = batal) : ").strip()
+    data.tampil_judul("KELOLA PENGGUNA")
+    data.tabel_pengguna(data.ambil_semua_user())
+    hapus = data.tanya("Username yang ingin dihapus (kosong = batal) : ")
     if hapus != "":
         try:
             data.hapus_user(hapus)
         except ValueError as pesan_error:
-            print("Error:", pesan_error)
+            data.cetak_error(str(pesan_error))
         except KeyError:
-            print("Error: Username tidak ditemukan!")
+            data.cetak_error("Username tidak ditemukan!")
         else:
-            print("Pengguna dan HP miliknya berhasil dihapus.")
-    input("Tekan Enter untuk kembali...")
+            data.cetak_sukses("Pengguna dan HP miliknya berhasil dihapus.")
+    data.tunggu()

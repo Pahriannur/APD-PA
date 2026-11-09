@@ -5,27 +5,27 @@ import menu_pengguna
 
 
 def jalankan_program():
-    data.buka_database("toko_hp.db")
+    data.buka_database("basis.db")
 
     program_jalan = True
 
     while program_jalan:
         data.bersihkan_layar()
-        print("=" * 42)
-        print("      TOKO JUAL BELI HP BEKAS")
-        print("=" * 42)
-        print("HP tersedia saat ini :", data.hitung_hp_tersedia())
-        print("-" * 42)
-        print("[1] Login")
-        print("[2] Register")
-        print("[3] Keluar")
-        pilih = input("Pilih menu: ").strip()
+        data.tampil_banner()
+        data.console.print("HP tersedia saat ini : [bold green]" +
+                           str(data.hitung_hp_tersedia()) + "[/]")
+        data.tampil_menu([
+            ("1", "Login"),
+            ("2", "Register"),
+            ("3", "Keluar"),
+        ])
+        pilih = data.tanya("Pilih menu : ")
 
         if pilih == "1":
             user = halaman_login.login()
 
             if user is None:
-                print("Percobaan habis. Program berakhir.")
+                data.cetak_error("Percobaan habis. Program berakhir.")
                 program_jalan = False
             elif user["role"] == "Admin":
                 menu_admin.menu_admin(user["username"])
@@ -36,12 +36,12 @@ def jalankan_program():
             halaman_login.register()
 
         elif pilih == "3":
-            print("Terima kasih. Program selesai.")
+            data.cetak_sukses("Terima kasih telah menggunakan BASIS. Program selesai.")
             program_jalan = False
 
         else:
-            print("Error: Menu tidak tersedia!")
-            input("Tekan Enter untuk kembali...")
+            data.cetak_error("Menu tidak tersedia!")
+            data.tunggu()
 
     data.tutup_database()
 

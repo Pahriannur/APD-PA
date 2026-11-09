@@ -7,33 +7,33 @@ def login():
 
     while percobaan < 3:
         data.bersihkan_layar()
-        print("=== LOGIN ===")
-        username = input("Username : ").strip()
-        password = input("Password : ").strip()
+        data.tampil_judul("LOGIN")
+        username = data.tanya("Username : ")
+        password = data.tanya_rahasia("Password : ")
 
         user = data.cek_login(username, password)
         if user is not None:
-            print("Login Berhasil")
-            input("Tekan Enter untuk lanjut...")
+            data.cetak_sukses("Login Berhasil")
+            data.tunggu("Tekan Enter untuk lanjut...")
             return user
 
         percobaan += 1
-        print("Login Gagal. Sisa percobaan:", 3 - percobaan)
-        input("Tekan Enter untuk lanjut...")
+        data.cetak_error("Login Gagal. Sisa percobaan : " + str(3 - percobaan))
+        data.tunggu("Tekan Enter untuk lanjut...")
 
     return None
 
 
 def register():
     data.bersihkan_layar()
-    print("=== REGISTER ===")
-    user_baru = input("Username baru : ").strip()
-    pass_baru = input("Password baru (min. 3 karakter) : ").strip()
+    data.tampil_judul("REGISTER")
+    user_baru = data.tanya("Username baru : ")
+    pass_baru = data.tanya_rahasia("Password baru (min. 3 karakter) : ")
     try:
         data.register_user(user_baru, pass_baru)
     except ValueError as pesan_error:
-        print("Error:", pesan_error)
+        data.cetak_error(str(pesan_error))
     else:
-        print("Registrasi berhasil! Silakan login.")
+        data.cetak_sukses("Registrasi berhasil! Silakan login.")
     finally:
-        input("Tekan Enter untuk kembali...")
+        data.tunggu()

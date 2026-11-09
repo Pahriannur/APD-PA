@@ -7,19 +7,18 @@ def menu_pengguna(nama_aktif):
 
     while sudah_login:
         data.bersihkan_layar()
-        print("=" * 42)
-        print("Halo,", nama_aktif, "(" + role_aktif + ")")
-        print("Saldo : Rp", data.format_rupiah(data.ambil_saldo(nama_aktif)))
-        print("=" * 42)
-        print("[1] Jual HP              (Create)")
-        print("[2] Lihat / Cari HP      (Read)")
-        print("[3] Ubah Data HP         (Update)")
-        print("[4] Hapus HP             (Delete)")
-        print("[5] Beli HP")
-        print("[6] Riwayat Transaksi Saya")
-        print("[7] Top Up Saldo")
-        print("[0] Logout")
-        menu = input("Pilih menu: ").strip()
+        data.tampil_header(nama_aktif, role_aktif, data.ambil_saldo(nama_aktif))
+        data.tampil_menu([
+            ("1", "Jual HP              (Create)"),
+            ("2", "Lihat / Cari HP      (Read)"),
+            ("3", "Ubah Data HP         (Update)"),
+            ("4", "Hapus HP             (Delete)"),
+            ("5", "Beli HP"),
+            ("6", "Riwayat Transaksi Saya"),
+            ("7", "Top Up Saldo"),
+            ("0", "Logout"),
+        ])
+        menu = data.tanya("Pilih menu : ")
 
         if menu == "1":
             data.tampil_jual_hp(nama_aktif)
@@ -46,22 +45,24 @@ def menu_pengguna(nama_aktif):
             sudah_login = False
 
         else:
-            print("Error: Menu tidak tersedia!")
-            input("Tekan Enter untuk kembali...")
+            data.cetak_error("Menu tidak tersedia!")
+            data.tunggu()
 
 
 def top_up_saldo(nama_aktif):
     data.bersihkan_layar()
-    print("=== TOP UP SALDO ===")
-    print("Saldo saat ini : Rp", data.format_rupiah(data.ambil_saldo(nama_aktif)))
-    print("(Minimal Rp 10.000, maksimal Rp 10.000.000)")
-    nominal = input("Nominal top up (Rp) : ").strip()
+    data.tampil_judul("TOP UP SALDO", "green")
+    data.console.print("Saldo saat ini : [bold green]Rp " +
+                       data.format_rupiah(data.ambil_saldo(nama_aktif)) + "[/]")
+    data.cetak_info("Minimal Rp 10.000, maksimal Rp 10.000.000")
+    nominal = data.tanya("Nominal top up (Rp) : ")
     try:
         saldo_baru = data.top_up(nama_aktif, nominal)
     except ValueError as pesan_error:
-        print("Error:", pesan_error)
+        data.cetak_error(str(pesan_error))
     else:
-        print("Top up berhasil!")
-        print("Saldo sekarang : Rp", data.format_rupiah(saldo_baru))
+        data.cetak_sukses("Top up berhasil!")
+        data.console.print("Saldo sekarang : [bold green]Rp " +
+                           data.format_rupiah(saldo_baru) + "[/]")
     finally:
-        input("Tekan Enter untuk kembali...")
+        data.tunggu()
