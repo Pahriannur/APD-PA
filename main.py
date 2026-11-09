@@ -1,7 +1,4 @@
-# ============================================
-# PROGRAM UTAMA - TOKO JUAL BELI HP BEKAS
-# Memakai library: lib_toko_hp.py (satu folder)
-# ============================================
+
 import lib_toko_hp as toko
 
 
