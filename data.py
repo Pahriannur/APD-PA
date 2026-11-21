@@ -368,7 +368,21 @@ def cek_boleh_hapus(id_hp, nama_aktif, role):
     hp = ambil_hp(id_hp)
     if role != "Admin" and hp["penjual"] != nama_aktif:
         raise ValueError("Anda hanya boleh menghapus HP milik sendiri!")
+    if hp["status"] == "Terjual":
+        raise ValueError("HP yang sudah terjual tidak bisa dihapus!")
     return hp
+
+
+def ambil_hp_milik(nama_aktif, role):
+    # Admin melihat semua HP, pengguna biasa hanya HP miliknya sendiri
+    if role == "Admin":
+        kursor.execute("SELECT * FROM data_hp ORDER BY id")
+    else:
+        kursor.execute(
+            "SELECT * FROM data_hp WHERE penjual = ? ORDER BY id",
+            (nama_aktif,),
+        )
+    return kursor.fetchall()
 
 
 def hapus_hp(id_hp):
@@ -475,6 +489,12 @@ def tampil_lihat_hp():
 def tampil_ubah_hp(nama_aktif, role_aktif):
     bersihkan_layar()
     tampil_judul("UBAH DATA HP", "yellow")
+    daftar = ambil_hp_milik(nama_aktif, role_aktif)
+    if len(daftar) == 0:
+        cetak_info("Tidak ada data HP yang bisa diubah.")
+        tunggu()
+        return
+    tabel_hp(daftar, "HP yang bisa diubah")
     id_input = tanya("Masukkan ID HP yang ingin diubah : ")
     try:
         if not cek_angka(id_input):
@@ -506,6 +526,12 @@ def tampil_ubah_hp(nama_aktif, role_aktif):
 def tampil_hapus_hp(nama_aktif, role_aktif):
     bersihkan_layar()
     tampil_judul("HAPUS HP", "red")
+    daftar = ambil_hp_milik(nama_aktif, role_aktif)
+    if len(daftar) == 0:
+        cetak_info("Tidak ada data HP yang bisa dihapus.")
+        tunggu()
+        return
+    tabel_hp(daftar, "HP yang bisa dihapus")
     id_input = tanya("Masukkan ID HP yang ingin dihapus : ")
     try:
         if not cek_angka(id_input):
