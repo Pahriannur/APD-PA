@@ -9,10 +9,10 @@ def menu_admin(nama_aktif):
         data.bersihkan_layar()
         data.tampil_header(nama_aktif, role_aktif)
         data.tampil_menu([
-            ("1", "Jual HP              (Create)"),
-            ("2", "Lihat / Cari HP      (Read)"),
-            ("3", "Ubah Data HP         (Update)"),
-            ("4", "Hapus HP             (Delete)"),
+            ("1", "Jual HP        "),
+            ("2", "Lihat / Cari HP     "),
+            ("3", "Ubah Data HP         "),
+            ("4", "Hapus HP             "),
             ("5", "Kelola Pengguna"),
             ("6", "Riwayat Semua Transaksi"),
             ("7", "Beli HP dari Pengguna"),

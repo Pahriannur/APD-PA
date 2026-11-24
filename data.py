@@ -118,6 +118,8 @@ def buka_database(nama_db):
     kursor = koneksi.cursor()
     buat_tabel()
     isi_data_awal()
+    rapikan_id_hp()
+    koneksi.commit()
 
 
 def tutup_database():
@@ -217,6 +219,8 @@ def cek_login(username, password):
 def register_user(username, password):
     if username == "" or " " in username:
         raise ValueError("Username tidak boleh kosong atau mengandung spasi!")
+    if username == "-":
+        raise ValueError("Username tidak boleh '-'!")
     kursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
     if kursor.fetchone() is not None:
         raise ValueError("Username sudah dipakai!")
@@ -244,6 +248,7 @@ def hapus_user(username):
         raise ValueError("Akun Admin tidak boleh dihapus!")
     kursor.execute("DELETE FROM users WHERE username = ?", (username,))
     kursor.execute("DELETE FROM data_hp WHERE penjual = ?", (username,))
+    rapikan_id_hp()
     koneksi.commit()
 
 
@@ -385,8 +390,34 @@ def ambil_hp_milik(nama_aktif, role):
     return kursor.fetchall()
 
 
+def rapikan_id_hp():
+    # menyusun ulang id HP supaya berurutan 1, 2, 3, ... setelah ada yang dihapus
+    # riwayat transaksi dari HP yang sudah dihapus diberi id 0
+    kursor.execute(
+        "UPDATE transaksi SET id_hp = 0 "
+        "WHERE id_hp != 0 AND id_hp NOT IN (SELECT id FROM data_hp)"
+    )
+    kursor.execute("SELECT id FROM data_hp ORDER BY id")
+    semua_id = kursor.fetchall()
+
+    nomor_baru = 1
+    for baris in semua_id:
+        id_lama = baris["id"]
+        if id_lama != nomor_baru:
+            kursor.execute("UPDATE data_hp SET id = ? WHERE id = ?",
+                           (nomor_baru, id_lama))
+            kursor.execute("UPDATE transaksi SET id_hp = ? WHERE id_hp = ?",
+                           (nomor_baru, id_lama))
+        nomor_baru += 1
+
+    # supaya HP baru berikutnya mendapat id setelah id terakhir
+    kursor.execute("UPDATE sqlite_sequence SET seq = ? WHERE name = 'data_hp'",
+                   (nomor_baru - 1,))
+
+
 def hapus_hp(id_hp):
     kursor.execute("DELETE FROM data_hp WHERE id = ?", (id_hp,))
+    rapikan_id_hp()
     koneksi.commit()
 
 
@@ -439,8 +470,12 @@ def ambil_transaksi(nama_aktif, role):
         kursor.execute("SELECT * FROM transaksi ORDER BY no")
     else:
         kursor.execute(
-            "SELECT * FROM transaksi WHERE penjual = ? OR pembeli = ? ORDER BY no",
-            (nama_aktif, nama_aktif),
+            "SELECT * FROM transaksi WHERE "
+            "(jenis = 'Dijual' AND penjual = ?) OR "
+            "(jenis = 'Top Up' AND pembeli = ?) OR "
+            "(jenis = 'Terjual' AND (penjual = ? OR pembeli = ?)) "
+            "ORDER BY no",
+            (nama_aktif, nama_aktif, nama_aktif, nama_aktif),
         )
     return kursor.fetchall()
 
