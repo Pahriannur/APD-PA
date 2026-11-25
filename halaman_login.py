@@ -2,7 +2,7 @@ import data
 
 
 def login():
-    # mengembalikan data user kalau berhasil, None kalau 3x gagal
+
     percobaan = 0
 
     while percobaan < 3:

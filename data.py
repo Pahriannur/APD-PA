@@ -14,11 +14,9 @@ kursor = None
 console = Console()
 
 
-# ======================================================
-# TAMPILAN CANTIK (library rich)
-# ======================================================
+
 def aman(teks):
-    # supaya tanda [ ] dari input pengguna tidak dianggap kode warna
+  
     return escape(str(teks))
 
 
@@ -41,7 +39,7 @@ def tampil_header(nama, role, saldo=None):
 
 
 def tampil_menu(daftar_menu):
-    # daftar_menu berisi pasangan (kode, teks)
+
     tabel = Table(box=box.SIMPLE, show_header=False, width=50)
     tabel.add_column("Kode", style="bold yellow", justify="center", width=6)
     tabel.add_column("Menu")
@@ -110,7 +108,7 @@ def tabel_pengguna(daftar_user):
     console.print(tabel)
 
 
-# ---------- DATABASE ----------
+
 def buka_database(nama_db):
     global koneksi, kursor
     koneksi = sqlite3.connect(nama_db)
@@ -183,7 +181,7 @@ def isi_data_awal():
         koneksi.commit()
 
 
-# ---------- ALAT BANTU ----------
+
 def bersihkan_layar():
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -206,9 +204,8 @@ def format_rupiah(angka):
     return format_rupiah(angka // 1000) + "." + sisa
 
 
-# ---------- USER ----------
 def cek_login(username, password):
-    # mengembalikan data user, atau None kalau salah
+
     kursor.execute(
         "SELECT * FROM users WHERE username = ? AND password = ?",
         (username, password),
@@ -252,7 +249,7 @@ def hapus_user(username):
     koneksi.commit()
 
 
-# ---------- SALDO ----------
+
 def ambil_saldo(username):
     kursor.execute("SELECT saldo FROM users WHERE username = ?", (username,))
     baris = kursor.fetchone()
@@ -285,7 +282,7 @@ def top_up(username, nominal_input):
     return ambil_saldo(username)
 
 
-# ---------- HP ----------
+
 def hitung_hp_tersedia():
     kursor.execute("SELECT COUNT(*) FROM data_hp WHERE status = 'Tersedia'")
     return kursor.fetchone()[0]
@@ -347,7 +344,7 @@ def cek_boleh_ubah(id_hp, nama_aktif, role):
 
 
 def ubah_hp(id_hp, merk_baru, tipe_baru, kondisi_baru, harga_baru):
-    # input kosong = tidak diubah
+   
     if kondisi_baru != "" and kondisi_baru not in daftar_kondisi:
         raise ValueError("Kondisi harus 1, 2, atau 3!")
     if harga_baru != "":
@@ -379,7 +376,7 @@ def cek_boleh_hapus(id_hp, nama_aktif, role):
 
 
 def ambil_hp_milik(nama_aktif, role):
-    # Admin melihat semua HP, pengguna biasa hanya HP miliknya sendiri
+    
     if role == "Admin":
         kursor.execute("SELECT * FROM data_hp ORDER BY id")
     else:
@@ -391,8 +388,7 @@ def ambil_hp_milik(nama_aktif, role):
 
 
 def rapikan_id_hp():
-    # menyusun ulang id HP supaya berurutan 1, 2, 3, ... setelah ada yang dihapus
-    # riwayat transaksi dari HP yang sudah dihapus diberi id 0
+   
     kursor.execute(
         "UPDATE transaksi SET id_hp = 0 "
         "WHERE id_hp != 0 AND id_hp NOT IN (SELECT id FROM data_hp)"
@@ -410,7 +406,7 @@ def rapikan_id_hp():
                            (nomor_baru, id_lama))
         nomor_baru += 1
 
-    # supaya HP baru berikutnya mendapat id setelah id terakhir
+
     kursor.execute("UPDATE sqlite_sequence SET seq = ? WHERE name = 'data_hp'",
                    (nomor_baru - 1,))
 
@@ -452,11 +448,11 @@ def beli_hp(id_hp, pembeli):
         metode = "Dibeli Admin"
     else:
         metode = "Saldo"
-        # saldo pembeli berkurang (khusus pengguna biasa)
+
         kursor.execute("UPDATE users SET saldo = saldo - ? WHERE username = ?",
                        (hp["harga"], pembeli))
 
-    # saldo penjual selalu bertambah
+ 
     kursor.execute("UPDATE users SET saldo = saldo + ? WHERE username = ?",
                    (hp["harga"], hp["penjual"]))
     catat_transaksi(id_hp, hp["merk"] + " " + hp["tipe"],
@@ -464,7 +460,7 @@ def beli_hp(id_hp, pembeli):
     koneksi.commit()
 
 
-# ---------- TRANSAKSI ----------
+
 def ambil_transaksi(nama_aktif, role):
     if role == "Admin":
         kursor.execute("SELECT * FROM transaksi ORDER BY no")
@@ -480,9 +476,7 @@ def ambil_transaksi(nama_aktif, role):
     return kursor.fetchall()
 
 
-# ======================================================
-# LAYAR YANG DIPAKAI BERSAMA (Admin & Pengguna Biasa)
-# ======================================================
+
 def tampil_jual_hp(nama_aktif):
     bersihkan_layar()
     tampil_judul("JUAL HP")
